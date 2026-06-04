@@ -16,7 +16,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isLoading = true;
   String selectedStatus = '';
   String searchQuery = '';
-  
+
   // Track loading state for each action (approve/reject)
   final Map<String, bool> _processingIds = {};
 
@@ -38,9 +38,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } catch (e) {
       setState(() => isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengambil data: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Gagal mengambil data: $e')));
       }
     }
   }
@@ -51,9 +51,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         filteredPlaces = List.from(allPlaces);
       } else {
         filteredPlaces = allPlaces
-            .where((place) => (place['name'] ?? '')
-                .toLowerCase()
-                .contains(searchQuery.toLowerCase()))
+            .where(
+              (place) => (place['name'] ?? '').toLowerCase().contains(
+                searchQuery.toLowerCase(),
+              ),
+            )
             .toList();
       }
     });
@@ -75,7 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _handleAction(String id, String action, {String? reason}) async {
     setState(() => _processingIds[id] = true);
-    
+
     bool success = false;
     if (action == 'approve') {
       success = await adminService.approvePlace(id);
@@ -86,14 +88,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (mounted) {
       setState(() => _processingIds[id] = false);
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Berhasil $action place')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Berhasil $action place')));
         fetchPlaces();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal $action place')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Gagal $action place')));
       }
     }
   }
@@ -105,7 +107,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isDesktop = MediaQuery.of(context).size.width > 600;
 
     return Scaffold(
-      backgroundColor: colorScheme.surfaceVariant.withOpacity(0.3),
+      backgroundColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
       appBar: AppBar(
         title: const Text(
           'FindCafe Admin',
@@ -155,18 +157,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       : SliverPadding(
                           padding: const EdgeInsets.all(16.0),
                           sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final place = filteredPlaces[index];
-                                return _PlaceCard(
-                                  place: place,
-                                  isProcessing: _processingIds[place['id']] ?? false,
-                                  onApprove: () => _handleAction(place['id'], 'approve'),
-                                  onReject: () => _handleAction(place['id'], 'reject'),
-                                );
-                              },
-                              childCount: filteredPlaces.length,
-                            ),
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              final place = filteredPlaces[index];
+                              return _PlaceCard(
+                                place: place,
+                                isProcessing:
+                                    _processingIds[place['id']] ?? false,
+                                onApprove: () =>
+                                    _handleAction(place['id'], 'approve'),
+                                onReject: () =>
+                                    _handleAction(place['id'], 'reject'),
+                              );
+                            }, childCount: filteredPlaces.length),
                           ),
                         ),
                 ],
@@ -260,9 +265,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   items: const [
                     DropdownMenuItem(value: '', child: Text('Semua Status')),
                     DropdownMenuItem(value: 'pending', child: Text('Pending')),
-                    DropdownMenuItem(value: 'approved', child: Text('Approved')),
-                    DropdownMenuItem(value: 'rejected', child: Text('Rejected')),
-                    DropdownMenuItem(value: 'archived', child: Text('Archived')),
+                    DropdownMenuItem(
+                      value: 'approved',
+                      child: Text('Approved'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'rejected',
+                      child: Text('Rejected'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'archived',
+                      child: Text('Archived'),
+                    ),
                   ],
                   onChanged: (value) {
                     setState(() {
@@ -293,17 +307,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text(
             'Tidak ada data ditemukan',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                  fontWeight: FontWeight.bold,
-                ),
+              color: Theme.of(context).colorScheme.outline,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'Coba ubah filter atau kata kunci pencarian Anda',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
+              color: Theme.of(context).colorScheme.outline,
+            ),
           ),
         ],
       ),
@@ -394,7 +408,7 @@ class _PlaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final status = (place['status'] ?? 'pending').toString().toLowerCase();
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
@@ -461,10 +475,17 @@ class _PlaceCard extends StatelessWidget {
                 if (status != 'rejected')
                   TextButton.icon(
                     onPressed: isProcessing ? null : onReject,
-                    icon: isProcessing 
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.close, size: 18, color: Colors.red),
-                    label: const Text('Reject', style: TextStyle(color: Colors.red)),
+                    icon: isProcessing
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.close, size: 18, color: Colors.red),
+                    label: const Text(
+                      'Reject',
+                      style: TextStyle(color: Colors.red),
+                    ),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
@@ -475,16 +496,25 @@ class _PlaceCard extends StatelessWidget {
                 if (status != 'approved')
                   FilledButton.icon(
                     onPressed: isProcessing ? null : onApprove,
-                    icon: isProcessing 
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Icon(Icons.check, size: 18),
+                    icon: isProcessing
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.check, size: 18),
                     label: const Text('Approve'),
                     style: FilledButton.styleFrom(
                       backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
                   ),
-                if (status == 'approved' || status == 'rejected' && false) // Logic for when no buttons shown
+                if (status == 'approved' ||
+                    status == 'rejected' &&
+                        false) // Logic for when no buttons shown
                   Text(
                     'No further actions',
                     style: TextStyle(

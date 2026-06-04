@@ -1,3 +1,3 @@
 class Api {
-  static const String baseUrl = 'http://localhost:3000/api/v1';
+  static const String baseUrl = 'https://arymacloudfindcafe.imrnes.team/api/v1';
 }
