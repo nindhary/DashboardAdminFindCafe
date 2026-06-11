@@ -50,4 +50,19 @@ class AuthService {
       throw Exception(e.toString());
     }
   }
+
+  Future<void> logout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      await prefs.remove('token');
+      await prefs.remove('role');
+      await prefs.remove('name');
+      
+      print('Logout berhasil: Data sesi dihapus');
+    } catch (e) {
+      print('ERROR LOGOUT: $e');
+      rethrow; 
+    }
+  }
 }
