@@ -27,10 +27,19 @@ class _LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
 
-    final success = await AuthService().login(
-      emailController.text,
-      passwordController.text,
-    );
+    bool success = false;
+
+    try {
+      success = await AuthService().login(
+        emailController.text,
+        passwordController.text,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('ERROR: $e'), backgroundColor: Colors.red),
+      );
+      return;
+    }
 
     if (!mounted) return;
 
@@ -51,10 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Login gagal. Periksa kembali email dan password Anda.',
-          ),
+        SnackBar(
+          content: Text('Login gagal: ${emailController.text}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -199,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               )
                             : const Text(
-                                'Login',
+                                'Login Dashboard',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
