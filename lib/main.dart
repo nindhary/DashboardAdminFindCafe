@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'screens/login_screen.dart';
 import 'screens/category_screen.dart';
 import 'screens/tag_screen.dart';
+import 'screens/report_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -104,7 +105,10 @@ class MyApp extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: primaryBlue, width: 1.5),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
         ),
         cardTheme: CardThemeData(
           color: Colors.white,
@@ -123,6 +127,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/categories': (context) => const CategoryScreen(),
         '/tags': (context) => const TagScreen(),
+        '/report': (context) => const ReportScreen(),
       },
     );
   }

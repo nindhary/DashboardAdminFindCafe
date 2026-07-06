@@ -45,10 +45,9 @@ class _TagScreenState extends State<TagScreen> {
   void searchTag(String keyword) {
     setState(() {
       filteredTags = tags.where((item) {
-        return item["name"]
-            .toString()
-            .toLowerCase()
-            .contains(keyword.toLowerCase());
+        return item["name"].toString().toLowerCase().contains(
+          keyword.toLowerCase(),
+        );
       }).toList();
     });
   }
@@ -61,9 +60,7 @@ class _TagScreenState extends State<TagScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           "Tambah Tag",
           style: GoogleFonts.inter(
@@ -179,17 +176,22 @@ class _TagScreenState extends State<TagScreen> {
         ],
       ),
     );
-
-    if (result == true) {
-      setState(() {
-        tags.insert(0, {
-          "id": DateTime.now().millisecondsSinceEpoch,
-          "name": nameController.text,
-          "type": typeController.text,
-        });
-
-        filteredTags = List.from(tags);
+    if (result == true &&
+        nameController.text.trim().isNotEmpty &&
+        typeController.text.trim().isNotEmpty) {
+      final success = await service.createTag({
+        "name": nameController.text.trim(),
+        "slug": nameController.text.trim().toLowerCase().replaceAll(" ", "-"),
+        "type": typeController.text.trim(),
       });
+
+      if (success) {
+        await loadData();
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Gagal menambah tag")));
+      }
     }
   }
 
@@ -201,9 +203,7 @@ class _TagScreenState extends State<TagScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           "Edit Tag",
           style: GoogleFonts.inter(
@@ -310,18 +310,18 @@ class _TagScreenState extends State<TagScreen> {
       ),
     );
 
-    if (result == true) {
-      final index = tags.indexWhere(
-        (e) => e["id"] == item["id"],
-      );
+    final success = await service.updateTag(int.parse(item["id"].toString()), {
+      "name": nameController.text.trim(),
+      "slug": nameController.text.trim().toLowerCase().replaceAll(" ", "-"),
+      "type": typeController.text.trim(),
+    });
 
-      if (index != -1) {
-        setState(() {
-          tags[index]["name"] = nameController.text;
-          tags[index]["type"] = typeController.text;
-          filteredTags = List.from(tags);
-        });
-      }
+    if (success) {
+      await loadData();
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal update tag")));
     }
   }
 
@@ -330,9 +330,7 @@ class _TagScreenState extends State<TagScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           "Hapus Tag",
           style: GoogleFonts.inter(
@@ -387,14 +385,14 @@ class _TagScreenState extends State<TagScreen> {
       ),
     );
 
-    if (confirm == true) {
-      setState(() {
-        tags.removeWhere(
-          (item) => item["id"] == id,
-        );
+    final success = await service.deleteTag(id);
 
-        filteredTags = List.from(tags);
-      });
+    if (success) {
+      await loadData();
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal hapus tag")));
     }
   }
 
@@ -435,9 +433,7 @@ class _TagScreenState extends State<TagScreen> {
         backgroundColor: MyApp.primaryBlue,
         foregroundColor: Colors.white,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         icon: const Icon(Icons.add_outlined),
         label: Text(
           "Tambah",
@@ -471,15 +467,24 @@ class _TagScreenState extends State<TagScreen> {
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: MyApp.lightGray, width: 1),
+                        borderSide: BorderSide(
+                          color: MyApp.lightGray,
+                          width: 1,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: MyApp.lightGray, width: 1),
+                        borderSide: BorderSide(
+                          color: MyApp.lightGray,
+                          width: 1,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: MyApp.primaryBlue, width: 1.5),
+                        borderSide: BorderSide(
+                          color: MyApp.primaryBlue,
+                          width: 1.5,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 18,
@@ -562,7 +567,9 @@ class _TagScreenState extends State<TagScreen> {
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: MyApp.favoriteAccent.withOpacity(0.1),
+                                      color: MyApp.favoriteAccent.withOpacity(
+                                        0.1,
+                                      ),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: IconButton(

@@ -4,6 +4,7 @@ import '../services/admin_service.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import '../main.dart';
+import 'report_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -132,9 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Logout',
           style: GoogleFonts.inter(
@@ -321,7 +320,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       label: 'Kelola Kategori',
                                       color: MyApp.primaryBlue,
                                       onTap: () {
-                                        Navigator.pushNamed(context, '/categories');
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/categories',
+                                        );
                                       },
                                     ),
                                     const SizedBox(height: 12),
@@ -331,6 +333,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       color: MyApp.favoriteAccent,
                                       onTap: () {
                                         Navigator.pushNamed(context, '/tags');
+                                      },
+                                    ),
+                                    const SizedBox(height: 12),
+                                    _buildManagementButton(
+                                      icon: Icons.report_problem_outlined,
+                                      label: 'Kelola Laporan',
+                                      color: Colors.amber.shade800,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const ReportScreen(),
+                                          ),
+                                        );
                                       },
                                     ),
                                   ],
@@ -344,7 +361,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         label: 'Kelola Kategori',
                                         color: MyApp.primaryBlue,
                                         onTap: () {
-                                          Navigator.pushNamed(context, '/categories');
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/categories',
+                                          );
                                         },
                                       ),
                                     ),
@@ -356,6 +376,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         color: MyApp.favoriteAccent,
                                         onTap: () {
                                           Navigator.pushNamed(context, '/tags');
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: _buildManagementButton(
+                                        icon: Icons.report_problem_outlined,
+                                        label: 'Kelola Laporan',
+                                        color: Colors.amber.shade800,
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  const ReportScreen(),
+                                            ),
+                                          );
                                         },
                                       ),
                                     ),
@@ -391,21 +428,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       : SliverPadding(
                           padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                           sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final place = filteredPlaces[index];
-                                return _PlaceCard(
-                                  place: place,
-                                  isProcessing:
-                                      _processingIds[place['id']] ?? false,
-                                  onApprove: () =>
-                                      _handleAction(place['id'], 'approve'),
-                                  onReject: () =>
-                                      _handleAction(place['id'], 'reject'),
-                                );
-                              },
-                              childCount: filteredPlaces.length,
-                            ),
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              final place = filteredPlaces[index];
+                              return _PlaceCard(
+                                place: place,
+                                isProcessing:
+                                    _processingIds[place['id']] ?? false,
+                                onApprove: () =>
+                                    _handleAction(place['id'], 'approve'),
+                                onReject: () =>
+                                    _handleAction(place['id'], 'reject'),
+                              );
+                            }, childCount: filteredPlaces.length),
                           ),
                         ),
                 ],
@@ -481,11 +518,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       color: item['color'].withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(
-                      item['icon'],
-                      color: item['color'],
-                      size: 22,
-                    ),
+                    child: Icon(item['icon'], color: item['color'], size: 22),
                   ),
                   const Spacer(),
                   Text(
@@ -545,8 +578,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide:
-                  BorderSide(color: MyApp.primaryBlue, width: 1.5),
+              borderSide: BorderSide(color: MyApp.primaryBlue, width: 1.5),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 18,
@@ -565,10 +597,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: MyApp.lightGray,
-              width: 1,
-            ),
+            border: Border.all(color: MyApp.lightGray, width: 1),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -584,26 +613,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 fontWeight: FontWeight.w600,
               ),
               items: const [
-                DropdownMenuItem(
-                  value: '',
-                  child: Text('Semua Status'),
-                ),
-                DropdownMenuItem(
-                  value: 'pending',
-                  child: Text('Pending'),
-                ),
-                DropdownMenuItem(
-                  value: 'approved',
-                  child: Text('Approved'),
-                ),
-                DropdownMenuItem(
-                  value: 'rejected',
-                  child: Text('Rejected'),
-                ),
-                DropdownMenuItem(
-                  value: 'archived',
-                  child: Text('Archived'),
-                ),
+                DropdownMenuItem(value: '', child: Text('Semua Status')),
+                DropdownMenuItem(value: 'pending', child: Text('Pending')),
+                DropdownMenuItem(value: 'approved', child: Text('Approved')),
+                DropdownMenuItem(value: 'rejected', child: Text('Rejected')),
+                DropdownMenuItem(value: 'archived', child: Text('Archived')),
               ],
               onChanged: (value) {
                 setState(() {
@@ -672,17 +686,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: 18,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: MyApp.lightGray,
-            width: 1,
-          ),
+          border: Border.all(color: MyApp.lightGray, width: 1),
           boxShadow: [
             BoxShadow(
               color: MyApp.darkText.withOpacity(0.03),
@@ -699,11 +707,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 22,
-              ),
+              child: Icon(icon, color: color, size: 22),
             ),
             const SizedBox(width: 12),
             Flexible(
@@ -748,10 +752,7 @@ class _PlaceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: MyApp.lightGray,
-          width: 1,
-        ),
+        border: Border.all(color: MyApp.lightGray, width: 1),
         boxShadow: [
           BoxShadow(
             color: MyApp.darkText.withOpacity(0.02),
@@ -807,17 +808,11 @@ class _PlaceCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Flexible(
-                flex: 0,
-                child: _StatusBadge(status: status),
-              ),
+              Flexible(flex: 0, child: _StatusBadge(status: status)),
             ],
           ),
           const SizedBox(height: 20),
-          Divider(
-            height: 1,
-            color: MyApp.lightGray,
-          ),
+          Divider(height: 1, color: MyApp.lightGray),
           const SizedBox(height: 18),
           Wrap(
             spacing: 10,
@@ -870,10 +865,7 @@ class _PlaceCard extends StatelessWidget {
                             color: Colors.white,
                           ),
                         )
-                      : const Icon(
-                          Icons.check_rounded,
-                          size: 20,
-                        ),
+                      : const Icon(Icons.check_rounded, size: 20),
                   label: Text(
                     'Approve',
                     style: GoogleFonts.inter(

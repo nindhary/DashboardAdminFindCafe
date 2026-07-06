@@ -45,10 +45,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
   void searchCategory(String keyword) {
     setState(() {
       filteredCategories = categories.where((item) {
-        return item["name"]
-            .toString()
-            .toLowerCase()
-            .contains(keyword.toLowerCase());
+        return item["name"].toString().toLowerCase().contains(
+          keyword.toLowerCase(),
+        );
       }).toList();
     });
   }
@@ -60,9 +59,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           "Tambah Kategori",
           style: GoogleFonts.inter(
@@ -140,16 +137,19 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ],
       ),
     );
-
-    if (result == true && controller.text.isNotEmpty) {
-      setState(() {
-        categories.insert(0, {
-          "id": DateTime.now().millisecondsSinceEpoch,
-          "name": controller.text,
-        });
-
-        filteredCategories = List.from(categories);
+    if (result == true && controller.text.trim().isNotEmpty) {
+      final success = await service.createCategory({
+        "name": controller.text.trim(),
+        "slug": controller.text.trim().toLowerCase().replaceAll(" ", "-"),
       });
+
+      if (success) {
+        await loadData();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Gagal menambahkan kategori")),
+        );
+      }
     }
   }
 
@@ -160,9 +160,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           "Edit Kategori",
           style: GoogleFonts.inter(
@@ -235,17 +233,19 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ],
       ),
     );
+    if (result == true && controller.text.trim().isNotEmpty) {
+      final success = await service
+          .updateCategory(int.parse(item["id"].toString()), {
+            "name": controller.text.trim(),
+            "slug": controller.text.trim().toLowerCase().replaceAll(" ", "-"),
+          });
 
-    if (result == true) {
-      final index = categories.indexWhere(
-        (e) => e["id"] == item["id"],
-      );
-
-      if (index != -1) {
-        setState(() {
-          categories[index]["name"] = controller.text;
-          filteredCategories = List.from(categories);
-        });
+      if (success) {
+        await loadData();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Gagal mengubah kategori")),
+        );
       }
     }
   }
@@ -255,9 +255,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           "Hapus",
           style: GoogleFonts.inter(
@@ -313,13 +311,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
 
     if (confirm == true) {
-      setState(() {
-        categories.removeWhere(
-          (item) => item["id"] == id,
-        );
+      final success = await service.deleteCategory(id);
 
-        filteredCategories = List.from(categories);
-      });
+      if (success) {
+        await loadData();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Gagal menghapus kategori")),
+        );
+      }
     }
   }
 
@@ -360,9 +360,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         backgroundColor: MyApp.primaryBlue,
         foregroundColor: Colors.white,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         icon: const Icon(Icons.add_outlined),
         label: Text(
           "Tambah",
@@ -396,15 +394,24 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: MyApp.lightGray, width: 1),
+                        borderSide: BorderSide(
+                          color: MyApp.lightGray,
+                          width: 1,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: MyApp.lightGray, width: 1),
+                        borderSide: BorderSide(
+                          color: MyApp.lightGray,
+                          width: 1,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: MyApp.primaryBlue, width: 1.5),
+                        borderSide: BorderSide(
+                          color: MyApp.primaryBlue,
+                          width: 1.5,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 18,
@@ -487,7 +494,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: MyApp.favoriteAccent.withOpacity(0.1),
+                                      color: MyApp.favoriteAccent.withOpacity(
+                                        0.1,
+                                      ),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: IconButton(
@@ -511,7 +520,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                         color: Colors.red,
                                         size: 22,
                                       ),
-                                      onPressed: () => deleteCategory(item["id"]),
+                                      onPressed: () => deleteCategory(
+                                        int.parse(item["id"].toString()),
+                                      ),
                                     ),
                                   ),
                                 ],
