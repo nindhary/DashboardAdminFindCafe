@@ -330,7 +330,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
                                   const SizedBox(width: 10),
 
-                                  if (item["status"] == "pending")
+                                  if (item["status"] == "open")
                                     Expanded(
                                       child: ElevatedButton.icon(
                                         icon: const Icon(
@@ -355,7 +355,18 @@ class _ReportScreenState extends State<ReportScreen> {
                                       child: ElevatedButton.icon(
                                         icon: const Icon(Icons.verified),
                                         label: const Text("Resolved"),
-                                        onPressed: null,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.grey,
+                                          foregroundColor: Colors.white,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                        ),
+                                        onPressed:
+                                            () {}, // atau null kalau mau disabled
                                       ),
                                     ),
                                 ],
