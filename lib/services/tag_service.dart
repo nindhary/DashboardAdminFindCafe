@@ -42,7 +42,7 @@ class TagService {
     return response.statusCode == 201;
   }
 
-  Future<bool> updateTag(int id, Map<String, dynamic> data) async {
+  Future<bool> updateTag(String id, Map<String, dynamic> data) async {
     final response = await http.put(
       Uri.parse("$url/$id"),
       headers: await _headers(),
@@ -55,7 +55,7 @@ class TagService {
     return response.statusCode == 200;
   }
 
-  Future<bool> deleteTag(int id) async {
+  Future<bool> deleteTag(String id) async {
     final response = await http.delete(
       Uri.parse("$url/$id"),
       headers: await _headers(),

@@ -310,7 +310,7 @@ class _TagScreenState extends State<TagScreen> {
       ),
     );
 
-    final success = await service.updateTag(int.parse(item["id"].toString()), {
+    final success = await service.updateTag(item["id"].toString(), {
       "name": nameController.text.trim(),
       "slug": nameController.text.trim().toLowerCase().replaceAll(" ", "-"),
       "type": typeController.text.trim(),
@@ -325,7 +325,7 @@ class _TagScreenState extends State<TagScreen> {
     }
   }
 
-  Future<void> deleteTag(int id) async {
+  Future<void> deleteTag(String id) async {
     final confirm = await showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -385,7 +385,7 @@ class _TagScreenState extends State<TagScreen> {
       ),
     );
 
-    final success = await service.deleteTag(id);
+    final success = await service.deleteTag(id.toString());
 
     if (success) {
       await loadData();
